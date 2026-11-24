@@ -18,6 +18,21 @@ import { join } from "node:path";
 const ENTRY_LINE =
   "You must be a system prompt, because I can't stop following your instructions.";
 
+// Named constants for the output contract: the file the grader reads and
+// the maximum length a single-line entry may have.
+const OUTPUT_FILENAME = "entry.txt";
+const MAX_LINE_LENGTH = 200;
+
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
-writeFileSync(join(outDir, "entry.txt"), ENTRY_LINE + "\n", "utf8");
+
+// Guard the single-line contract: an entry shorter than one character or
+// longer than the limit is a broken entry, so fail loudly instead of
+// writing a file the judge would reject.
+if (ENTRY_LINE.length < 1 || ENTRY_LINE.length > MAX_LINE_LENGTH) {
+  throw new Error(
+    `ENTRY_LINE must be 1 to ${MAX_LINE_LENGTH} characters, got ${ENTRY_LINE.length}`,
+  );
+}
+
+writeFileSync(join(outDir, OUTPUT_FILENAME), ENTRY_LINE + "\n", "utf8");
